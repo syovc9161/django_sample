@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - /Users/hgs/code/dev/django_docker/mysite/backup/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=sampledb
+      - POSTGRES_USER=sampleuser
+      - POSTGRES_PASSWORD=samplesecret
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+    networks:
+      app_net:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "5432:5432"
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    environment:
+      - DJANGO_DEBUG=True
+      - DJANGO_DB_HOST=db
+      - DJANGO_DB_PORT=5432
+      - DJANGO_DB_NAME=sampledb
+      - DJANGO_DB_USERNAME=sampleuser
+      - DJANGO_DB_PASSWORD=samplesecret
+      - DJANGO_SECRET_KEY=dev_secret_key
+    networks:
+      app_net:
+        ipv4_address: 172.18.0.5
+    ports:
+      - "8000:8000"
+    command:
+      - bash
+      - -c
+      - |
+        ./wait-for-it.sh db:5432 -t 20
+        python manage.py migrate
+        python manage.py runserver 0:8000
+    restart: always
+    volumes:
+      - ./:/app/
+
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.18.0.2/24"
