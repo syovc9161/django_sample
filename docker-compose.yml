@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:latest
     volumes:
-      - /Users/hgs/code/dev/django_docker/mysite/backup/db:/var/lib/postgresql/data
+      - ../backup/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=sampledb
       - POSTGRES_USER=sampleuser
@@ -32,17 +32,28 @@ services:
         ipv4_address: 172.18.0.5
     ports:
       - "8000:8000"
+    # entrypoint: 
     command:
-      - bash
-      - -c
-      - |
-        ./wait-for-it.sh db:5432 -t 20
-        python manage.py migrate
-        python manage.py runserver 0:8000
+      # 
+      # python manage.py migrate
+      # python manage.py runserver 0:8001
+      # /bin/bash
+    - /bin/bash
+    - -c
+    - |
+      ./wait-for-it.sh db:5432 -t 10
+      ln -s /app/mysite.conf /etc/nginx/sites-enabled/
+      /etc/init.d/nginx start
+      uwsgi --ini mysite.ini
+      python manage.py makemigrations
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+      /bin/bash
+    stdin_open: true
+    tty: true
     restart: always
     volumes:
       - ./:/app/
-
 networks:
   app_net:
     ipam:
