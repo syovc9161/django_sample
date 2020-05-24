@@ -22,9 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '7ngkdjajhzi2oi+6izsv+!hg5lhdhzb0(d8d(qv11$i=)14n*)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
+# DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'page.apps.PageConfig',
+    'profiles.apps.ProfilesConfig',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +125,7 @@ STATIC_ROOT = '/app/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'page/templates'),
+    os.path.join(BASE_DIR, 'profiles/templates'),
 ] # 개발단계에서 사용하는 정적파일
 
 MEDIA_URL = '/media/'
@@ -130,3 +133,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 
 if DEBUG:
     ALLOWED_HOSTS += ['*', ]
+
+## Login / Logout
+LOGIN_REDIRECT_URL = '/page/upload/'

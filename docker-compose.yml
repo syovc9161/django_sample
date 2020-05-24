@@ -20,13 +20,14 @@ services:
       context: .
       dockerfile: ./compose/django/Dockerfile
     environment:
-      - DJANGO_DEBUG=True
+      - DJANGO_DEBUG=False
       - DJANGO_DB_HOST=db
       - DJANGO_DB_PORT=5432
       - DJANGO_DB_NAME=sampledb
       - DJANGO_DB_USERNAME=sampleuser
       - DJANGO_DB_PASSWORD=samplesecret
       - DJANGO_SECRET_KEY=dev_secret_key
+      - PYTHONIOENCODING=UTF-8
     networks:
       app_net:
         ipv4_address: 172.18.0.5
@@ -41,7 +42,7 @@ services:
     - /bin/bash
     - -c
     - |
-      ./wait-for-it.sh db:5432 -t 10
+      ./wait-for-it.sh db:5432 -t 20
       ln -s /app/mysite.conf /etc/nginx/sites-enabled/
       /etc/init.d/nginx start
       uwsgi --ini mysite.ini
